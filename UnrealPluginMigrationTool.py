@@ -1,6 +1,19 @@
 import subprocess
 from tkinter import Tk, Canvas, Label, Entry, Button, filedialog, messagebox
-import os
+
+
+def set_dark_theme():
+    window.configure(bg="#333")
+    canvas.configure(bg="#333")
+
+    for widget in window.winfo_children():
+        if isinstance(widget, (Label, Entry, Button)):
+            widget.configure(bg="#555", fg="white")
+
+    engine_button.configure(bg="#333", fg="white")
+    origin_button.configure(bg="#333", fg="white")
+    output_button.configure(bg="#333", fg="white")
+    print_button.configure(bg="#333", fg="white")
 
 
 def get_engine_path():
@@ -37,7 +50,7 @@ def migrate_plugin():
     try:
         subprocess.run(command, shell=True)
         messagebox.showinfo(
-            title="Migration complete", message="Your plugin was succesfully ported"
+            title="Migration complete", message="Your plugin was successfully ported"
         )
     except Exception as e:
         messagebox.showerror(title="Error", message="Error during the migration")
@@ -78,5 +91,7 @@ output_button.grid(column=2, row=2)
 
 print_button = Button(window, text="Begin Plugin Migration", command=migrate_plugin)
 print_button.grid(column=1, row=3)
+
+set_dark_theme()
 
 window.mainloop()
