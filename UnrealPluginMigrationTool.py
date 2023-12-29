@@ -1,97 +1,144 @@
+import flet as ft
 import subprocess
-from tkinter import Tk, Canvas, Label, Entry, Button, filedialog, messagebox
 
 
-def set_dark_theme():
-    window.configure(bg="#333")
-    canvas.configure(bg="#333")
+def main(page: ft.Page):
+    page.title = "Unreal Plugin Migration Tool"
+    page.window_resizable = True
+    page.update()
 
-    for widget in window.winfo_children():
-        if isinstance(widget, (Label, Entry, Button)):
-            widget.configure(bg="#555", fg="white")
-
-    engine_button.configure(bg="#333", fg="white")
-    origin_button.configure(bg="#333", fg="white")
-    output_button.configure(bg="#333", fg="white")
-    print_button.configure(bg="#333", fg="white")
-
-
-def get_engine_path():
-    engine_path = filedialog.askdirectory()
-    engine_path = engine_path.replace("/", "\\")
-    engine_entry.delete(0, "end")
-    engine_entry.insert(0, engine_path)
-
-
-def get_origin_path():
-    origin_path = filedialog.askopenfilename(filetypes=[("Plugin Files", "*.uplugin")])
-    origin_path = origin_path.replace("/", "\\")
-    origin_entry.delete(0, "end")
-    origin_entry.insert(0, origin_path)
-
-
-def get_output_path():
-    output_path = filedialog.askdirectory()
-    output_path = output_path.replace("/", "\\")
-    output_entry.delete(0, "end")
-    output_entry.insert(0, output_path)
-
-
-def migrate_plugin():
-    origin = origin_entry.get()
-    output = output_entry.get()
-    engine = engine_entry.get()
-    engine = '"' + engine + '"'
-    origin = '"' + origin + '"'
-    output = '"' + output + '"'
-
-    command = rf"{engine}\Engine\Build\BatchFiles\RunUAT.bat BuildPlugin -plugin={origin} -package={output}\Migrated"
-
-    try:
-        subprocess.run(command, shell=True)
-        messagebox.showinfo(
-            title="Migration complete", message="Your plugin was successfully ported"
+    # Theme selector
+    def theme_changed(e):
+        page.theme_mode = (
+            ft.ThemeMode.LIGHT
+            if page.theme_mode == ft.ThemeMode.DARK
+            else ft.ThemeMode.DARK
         )
-    except Exception as e:
-        messagebox.showerror(title="Error", message="Error during the migration")
+        color_switch.label = "🌙" if page.theme_mode == ft.ThemeMode.DARK else "☀️"
+        page.update()
+
+    page.theme_mode = ft.ThemeMode.DARK
+    color_switch = ft.Switch(label="🌙", on_change=theme_changed)
+
+    # File picker function
+    def pick_files_result(e: ft.FilePickerResultEvent):
+        selected_file.value = (
+            ", ".join(map(lambda f: f.path, e.files))
+            if e.files
+            else "No *.uplugin file was selected!"
+        )
+        selected_file.update()
+
+    pick_files_dialog = ft.FilePicker(on_result=pick_files_result)
+    selected_file = ft.Text()
+
+    # Save directory function
+    def save_directory_result(e: ft.FilePickerResultEvent):
+        save_file_path.value = e.path if e.path else "No save directory was selected!"
+        save_file_path.update()
+
+    save_directory_dialog = ft.FilePicker(on_result=save_directory_result)
+    save_file_path = ft.Text()
+
+    # Unreal engine directory function
+    def ue_get_directory_result(e: ft.FilePickerResultEvent):
+        directory_path.value = (
+            e.path
+            if e.path
+            else 'No UE root folder was selected! (Example "C:\\Program Files\\Epic Games\\UE_5.3)"'
+        )
+        directory_path.update()
+
+    get_directory_dialog = ft.FilePicker(on_result=ue_get_directory_result)
+    directory_path = ft.Text()
+
+    # Hide all dialogs in overlay
+    page.overlay.extend(
+        [pick_files_dialog, save_directory_dialog, get_directory_dialog]
+    )
+
+    # Plugin migration function
+    def plugin_migration():
+        engine = rf'"{directory_path.value}"'
+        plugin = rf'"{selected_file.value}"'
+        destination = rf'"{save_file_path.value}"'
+        command = rf"{engine}\Engine\Build\BatchFiles\RunUAT.bat BuildPlugin -plugin={plugin} -package={destination}\Migrated"
+        try:
+            result = subprocess.run(command, shell=True)
+            if result.returncode == 0:
+                fine = ft.AlertDialog(
+                    title=ft.Text("Plugin migrated succesfully"),
+                )
+                page.dialog = fine
+                fine.open = True
+                page.update()
+            else:
+                wrong = ft.AlertDialog(
+                    title=ft.Text("Something went wrong"),
+                )
+                page.dialog = wrong
+                wrong.open = True
+                page.update()
+
+        except Exception as e:
+            fail = ft.AlertDialog(
+                title=ft.Text("An error has ocurred"),
+                content=ft.Text(
+                    "Please check the command promp to see what the error is"
+                ),
+            )
+            page.dialog = fail
+            fail.open = True
+            page.update()
+
+    # App layout
+    page.add(
+        ft.Row(
+            [
+                color_switch,
+            ],
+            alignment=ft.MainAxisAlignment.END,
+        ),
+        ft.Row(
+            [
+                ft.ElevatedButton(
+                    "Select the .uplugin file",
+                    icon=ft.icons.UPLOAD_FILE,
+                    on_click=lambda _: pick_files_dialog.pick_files(
+                        allowed_extensions=["uplugin"]
+                    ),
+                ),
+                selected_file,
+            ]
+        ),
+        ft.Row(
+            [
+                ft.ElevatedButton(
+                    "Plugin destination folder",
+                    icon=ft.icons.SAVE,
+                    on_click=lambda _: save_directory_dialog.get_directory_path(),
+                    disabled=page.web,
+                ),
+                save_file_path,
+            ]
+        ),
+        ft.Row(
+            [
+                ft.ElevatedButton(
+                    "Select UE root folder",
+                    icon=ft.icons.FOLDER_OPEN,
+                    on_click=lambda _: get_directory_dialog.get_directory_path(),
+                    disabled=page.web,
+                ),
+                directory_path,
+            ]
+        ),
+        ft.ElevatedButton(
+            "Begin Migration",
+            icon=ft.icons.DEW_POINT,
+            on_click=lambda _: plugin_migration(),
+        ),
+    )
 
 
-window = Tk()
-window.title("Unreal Engine Plugin Migration Tool")
-window.config(padx=50, pady=50)
-canvas = Canvas(window, width=800, height=600)
-
-engine_label = Label(window, text="Engine Path:")
-engine_label.grid(column=0, row=0)
-
-engine_entry = Entry(window, width=60)
-engine_entry.grid(column=1, row=0)
-engine_entry.insert(0, "Select the root of the engine folder")
-
-engine_button = Button(window, text="Select Engine Path", command=get_engine_path)
-engine_button.grid(column=2, row=0)
-
-origin_label = Label(window, text="Origin Path:")
-origin_label.grid(column=0, row=1)
-
-origin_entry = Entry(window, width=60)
-origin_entry.grid(column=1, row=1)
-
-origin_button = Button(window, text="Select Origin Plugin", command=get_origin_path)
-origin_button.grid(column=2, row=1)
-
-output_label = Label(window, text="Output Path:")
-output_label.grid(column=0, row=2)
-
-output_entry = Entry(window, width=60)
-output_entry.grid(column=1, row=2)
-
-output_button = Button(window, text="Select Output Path", command=get_output_path)
-output_button.grid(column=2, row=2)
-
-print_button = Button(window, text="Begin Plugin Migration", command=migrate_plugin)
-print_button.grid(column=1, row=3)
-
-set_dark_theme()
-
-window.mainloop()
+ft.app(target=main)
