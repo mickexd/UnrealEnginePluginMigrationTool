@@ -1,41 +1,29 @@
 # Unreal Engine Plugin Migration Tool
+This is a simple Python application that provides a graphical user interface (GUI) for migrating Unreal Engine plugins using the Unreal Automation Tool (UAT). 
+It allows you to select the *.uplugin of your preference and recompile it to any Unreal Engine version you want. 
 
-This is a simple Python application that provides a graphical user interface (GUI) for migrating Unreal Engine plugins using the Unreal Automation Tool (UAT). It allows you to select the engine path, the original plugin path, and the output path for the migrated plugin. Once configured, the tool runs the migration process and provides feedback through message boxes.
 
-## Requirements
+## Features
 
-- Python 3.x
-- Tkinter library (usually included with Python)
-- Unreal Engine installed on your system
-- All the escential libraries to compile UE projects (dotsdk, llvm, and others applicable to your engine version)
+- Support for all major versions of Unreal Engine (e.g., UE4, UE5).
+- Automatic plugin format detection.
+- Plugin format migration if necessary.
+- Handling of third-party plugin dependencies.
+- Command line tool integration for batch processing.
 
 ## Usage
-
-1. Clone or download the repository to your local machine or download the precompiled binaries in the assets section (follow from steps 5 to 7).
-
-2. Make sure you have Python 3.x installed on your system.
-
-3. Open a terminal/command prompt and navigate to the directory where the repository is located.
-
-4. Run the application in a code editor like VScode.
-
-5. The GUI window will appear, prompting you to provide the necessary paths:
-- **Engine Path:** Select the root directory of your current Unreal Engine installation (The UE version you want your plugin to be).
-- **Origin Path:** Select the original plugin file (`.uplugin`) you want to migrate (This is your source).
-- **Output Path:** Choose the directory where the migrated plugin will be saved as your destination folder.
-
-6. After providing the paths, click the "Begin Plugin Migration" button. The tool will execute the migration process using UAT.
-
-7. Once the migration is complete, a message box will appear:
-- If the migration was successful, you will see a message indicating that the plugin was ported successfully.
-- If there was an error during the migration, an error message will be displayed.
+1. Download the latest version of the app on https://github.com/mickexd/UnrealEnginePluginMigrationTool/releases and open the application 
+2. Select the `.uplugin` file you want to migrate.
+3. Select the plugin destination folder .
+4. Select the UE root installation folder. (Example C:\Program Files\Epic Games\UE_5.0)
+5. Click on the "Begin Migration" button to start the migration process.
 
 ## Contributing
 
 Contributions to this project are welcome. If you find any issues or have suggestions for improvements, feel free to create an issue or submit a pull request.
 
 ## Disclaimer
-
+Please note that this tool is currently in development and may not be fully functional. 
+Always ensure you have backups of your original plugin files and project files before using this tool.
+Some plugins that have dependencies that are linked to a specific unreal engine version will fail during the migration process.
 This tool is provided as-is, I'm not responsible for any potential issues or data loss that may occur during the migration process. ENJOY!
-
-
