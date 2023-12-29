@@ -11,18 +11,18 @@ This is a simple Python application that provides a graphical user interface (GU
 
 ## Usage
 
-1. Clone or download the repository to your local machine.
+1. Clone or download the repository to your local machine or download the precompiled binaries in the assets section (follow from steps 5 to 7).
 
 2. Make sure you have Python 3.x installed on your system.
 
 3. Open a terminal/command prompt and navigate to the directory where the repository is located.
 
-4. Run the following command to start the application:
+4. Run the application in a code editor like VScode.
 
 5. The GUI window will appear, prompting you to provide the necessary paths:
-- **Engine Path:** Select the root directory of your Unreal Engine installation.
-- **Origin Path:** Select the original plugin file (`.uplugin`) you want to migrate.
-- **Output Path:** Choose the directory where the migrated plugin will be saved.
+- **Engine Path:** Select the root directory of your current Unreal Engine installation (The UE version you want your plugin to be).
+- **Origin Path:** Select the original plugin file (`.uplugin`) you want to migrate (This is your source).
+- **Output Path:** Choose the directory where the migrated plugin will be saved as your destination folder.
 
 6. After providing the paths, click the "Begin Plugin Migration" button. The tool will execute the migration process using UAT.
 
