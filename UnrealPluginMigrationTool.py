@@ -1,6 +1,7 @@
+import os
 import flet as ft
 import subprocess
-
+from sys import platform
 
 def main(page: ft.Page):
     page.title = "Unreal Plugin Migration Tool"
@@ -62,7 +63,12 @@ def main(page: ft.Page):
         engine = rf'"{directory_path.value}"'
         plugin = rf'"{selected_file.value}"'
         destination = rf'"{save_file_path.value}"'
-        command = rf"{engine}\Engine\Build\BatchFiles\RunUAT.bat BuildPlugin -plugin={plugin} -package={destination}\Migrated"
+
+        if platform == "linux" or platform == "linux2":
+            command = rf"{engine}/Engine/Build/BatchFiles/RunUAT.sh BuildPlugin -plugin={plugin} -package={destination}\Migrated"
+        else:
+            command = rf"{engine}\Engine\Build\BatchFiles\RunUAT.bat BuildPlugin -plugin={plugin} -package={destination}\Migrated"
+
         try:
             result = subprocess.run(command, shell=True)
             if result.returncode == 0:
