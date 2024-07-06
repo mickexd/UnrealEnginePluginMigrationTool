@@ -11,6 +11,7 @@ It allows you to select the *.uplugin of your preference and recompile it to any
 - Handling of third-party plugin dependencies.
 - Command line tool integration for batch processing.
 
+
 ## Usage
 1. Download the latest version of the app on https://github.com/mickexd/UnrealEnginePluginMigrationTool/releases and open the application 
 2. Select the `.uplugin` file you want to migrate.
